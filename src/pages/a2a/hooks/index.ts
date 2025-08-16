@@ -1,2 +1,1 @@
-export { useChatLogic } from './useChatLogic';
-export { useConfigManagement } from './useConfigManagement'; 
+export { useChatLogic } from './useChatLogic'; 

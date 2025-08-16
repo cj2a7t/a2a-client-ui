@@ -1,20 +1,43 @@
 import { useFlatInject, useHttp } from "@/utils/hooks";
 import { useTabKey } from "@/utils/tabkey";
-import { StarFilled } from "@ant-design/icons";
-import { Layout } from "antd";
+import { StarFilled, SettingOutlined } from "@ant-design/icons";
+import { Layout, Button, Tooltip } from "antd";
 import { Outlet } from "umi";
 import HeaderTab from "./components/HeaderTab";
+import { v4 as uuidv4 } from "uuid";
+import { useNavigate } from "umi";
+import { useFlatInject as useFlatInjectOriginal } from "@/utils/hooks";
 
 const { Header, Content } = Layout;
 const LayoutFC = () => {
     const [store] = useFlatInject("connection");
+    const [a2aStore] = useFlatInjectOriginal("a2a");
     const tabKey = useTabKey();
+    const nav = useNavigate();
     const { loading: loadingFetchCon } = useHttp(() =>
         store.onFetchConnections()
     );
 
     const handleDragStart = (event: any) => {
         event.preventDefault();
+    };
+
+    const addSettingsTab = async () => {
+        const newKey = uuidv4();
+        const newTab = {
+            label: "Settings",
+            key: newKey,
+            path: `/settings?tabKey=${newKey}`,
+        };
+        
+        // Set loading state for the new tab
+        await a2aStore.setTabLoading(newKey, true);
+        nav(`/settings?tabKey=${newKey}`);
+        
+        // Clear loading state after a short delay
+        setTimeout(async () => {
+            await a2aStore.setTabLoading(newKey, false);
+        }, 500);
     };
 
     const renderItem = (name: string, url: string, isStarred?: boolean) => ({
@@ -88,16 +111,28 @@ const LayoutFC = () => {
                     position: "relative",
                     display: "flex",
                     alignItems: "center",
-                    gap: "12px",
-                    paddingLeft: "80px",
+                    gap: "8px",
+                    padding: "0 16px 0 70px", // 左边70px，右边16px
                 }}
                 className="tauri-drag"
             >
                 <div className="app-title">
-                    <div className="app-title-main">ZOAP</div>
-                    <div className="app-title-sub">OpenA2A</div>
+                    <div className="app-title-main">A2A</div>
+                    <div className="app-title-sub">Client UI</div>
                 </div>
                 <HeaderTab />
+                
+                {/* Settings button - moved outside HeaderTab */}
+                <Tooltip title="Settings">
+                    <Button
+                        type="text"
+                        size="small"
+                        className="settings-btn"
+                        onClick={addSettingsTab}
+                    >
+                        <SettingOutlined />
+                    </Button>
+                </Tooltip>
             </Header>
             <Layout>
                 <Layout>

@@ -1,0 +1,221 @@
+.agents-container {
+    padding: 24px;
+    font-size: 12px;
+    
+    .agents-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        
+        .header-content {
+            h4 {
+                margin-bottom: 8px !important;
+                font-size: 16px;
+                font-weight: 600;
+                color: #1f2937;
+            }
+            
+            .ant-typography {
+                font-size: 12px;
+                color: #6b7280;
+            }
+        }
+        
+        .ant-btn {
+            font-size: 12px;
+            height: 32px;
+            padding: 0 12px;
+        }
+    }
+    
+    .agents-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+        
+        .agent-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            
+            &:hover {
+                border-color: #3b82f6;
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+            }
+            
+            .ant-card-body {
+                padding: 16px;
+            }
+            
+            .ant-card-actions {
+                background: #f9fafb;
+                border-top: 1px solid #f3f4f6;
+                
+                li {
+                    margin: 8px 0;
+                    
+                    .ant-btn {
+                        font-size: 12px;
+                        height: 28px;
+                        padding: 0 8px;
+                    }
+                }
+            }
+            
+            .agent-header {
+                margin-bottom: 12px;
+                
+                .agent-info {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    
+                    .agent-name {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #1f2937;
+                        margin-bottom: 4px;
+                    }
+                    
+                    .ant-tag {
+                        font-size: 10px;
+                        padding: 2px 6px;
+                        border-radius: 4px;
+                    }
+                }
+            }
+            
+            .agent-url {
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                
+                .anticon {
+                    color: #6b7280;
+                    font-size: 12px;
+                }
+                
+                .url-text {
+                    font-size: 11px;
+                    color: #6b7280;
+                    word-break: break-all;
+                }
+            }
+            
+            .agent-description {
+                margin-bottom: 12px;
+                
+                .ant-typography {
+                    font-size: 12px;
+                    line-height: 1.4;
+                    color: #6b7280;
+                }
+            }
+            
+            .agent-meta {
+                .created-date {
+                    font-size: 11px;
+                    color: #9ca3af;
+                }
+            }
+        }
+        
+        .empty-state {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+            
+            .empty-content {
+                text-align: center;
+                
+                .ant-typography {
+                    font-size: 12px;
+                    color: #6b7280;
+                    margin-bottom: 16px;
+                    display: block;
+                }
+                
+                .ant-btn {
+                    font-size: 12px;
+                    height: 32px;
+                    padding: 0 12px;
+                }
+            }
+        }
+    }
+}
+
+// Modal styling
+.ant-modal {
+    .ant-modal-header {
+        .ant-modal-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+    }
+    
+    .ant-modal-body {
+        .ant-form {
+            .ant-form-item {
+                margin-bottom: 16px;
+                
+                .ant-form-item-label {
+                    label {
+                        font-size: 12px;
+                        font-weight: 500;
+                        color: #374151;
+                    }
+                }
+                
+                .ant-input,
+                .ant-input-textarea {
+                    font-size: 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    
+                    &:hover {
+                        border-color: #9ca3af;
+                    }
+                    
+                    &:focus,
+                    &.ant-input-focused {
+                        border-color: #3b82f6;
+                        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+                    }
+                }
+            }
+        }
+    }
+    
+    .ant-modal-footer {
+        .ant-btn {
+            font-size: 12px;
+            height: 32px;
+            padding: 0 16px;
+        }
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .agents-container {
+        padding: 16px;
+        
+        .agents-header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        .agents-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+    }
+} 

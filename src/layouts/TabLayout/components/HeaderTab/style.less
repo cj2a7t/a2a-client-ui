@@ -137,7 +137,7 @@
 
     // 响应式宽度调整
     min-width: 60px !important;
-    max-width: 160px !important;
+    max-width: 130px !important;
 
     // 非激活状态 - 嵌入到顶部背景中
     &:not(.active) {
@@ -304,7 +304,7 @@
     font-size: 12px !important;
     border: none !important;
     border-radius: 6px 6px 0 0 !important; // 只保留顶部圆角
-    background: rgba(255, 255, 255, 0.08) !important; // 嵌入到背景中
+    background: transparent !important; // 去掉背景
     opacity: 0.8;
     transition: all 0.15s ease !important;
     pointer-events: auto !important;
@@ -312,9 +312,9 @@
 
     &:hover {
         color: #374151 !important;
-        background: rgba(255, 255, 255, 0.2) !important;
+        background: transparent !important; // 悬停时也保持透明
         border: none !important;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+        box-shadow: none !important; // 移除阴影
         transform: translateY(0px) scale(1.05) !important;
         opacity: 1 !important;
     }

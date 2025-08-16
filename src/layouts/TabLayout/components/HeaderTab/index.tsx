@@ -1,5 +1,5 @@
 import { getTabKey } from "@/utils/tabkey";
-import { RobotOutlined } from "@ant-design/icons";
+import { RobotOutlined, SettingOutlined, ApiOutlined, DatabaseOutlined } from "@ant-design/icons";
 import { Button, Flex, Tooltip } from "antd";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "umi";
@@ -11,6 +11,7 @@ interface TabItem {
     label: string;
     key: string;
     path: string;
+    icon?: React.ReactNode;
 }
 
 const MIN_TABS = 1;
@@ -36,7 +37,7 @@ const HeaderTab: React.FC = () => {
         if (!containerRef.current) return PREFERRED_TAB_WIDTH;
         
         const containerWidth = containerRef.current.offsetWidth;
-        const availableWidth = containerWidth - 100; // Subtract button and margin
+        const availableWidth = containerWidth - 120; // 减少预留空间，给更多tab空间
         const totalTabs = items.length;
         
         if (totalTabs === 0) return PREFERRED_TAB_WIDTH;
@@ -68,9 +69,21 @@ const HeaderTab: React.FC = () => {
     const handleWheel = useCallback((e: React.WheelEvent) => {
         if (scrollContainerRef.current) {
             e.preventDefault();
-            scrollContainerRef.current.scrollLeft += e.deltaY;
+            const scrollAmount = e.deltaY;
+            scrollContainerRef.current.scrollLeft += scrollAmount;
         }
     }, []);
+
+    // Get icon for path
+    const getIconForPath = (pathname: string) => {
+        const iconMap: Record<string, React.ReactNode> = {
+            "/new_connection": <ApiOutlined />,
+            "/xds": <DatabaseOutlined />,
+            "/a2a": <RobotOutlined />,
+            "/settings": <SettingOutlined />,
+        };
+        return iconMap[pathname] || <RobotOutlined />;
+    };
 
     useEffect(() => {
         const pathname = location.pathname;
@@ -85,14 +98,17 @@ const HeaderTab: React.FC = () => {
             "/new_connection": "New Connection",
             "/xds": "xDS Overview",
             "/a2a": "A2A Client",
+            "/settings": "Settings",
         };
         const newLabel = labelMap[pathname] ?? "Untitled Tab";
+        const newIcon = getIconForPath(pathname);
 
         if (!exists) {
             const newTab = {
                 label: newLabel,
                 key: tabKey,
                 path: `${pathname}?tabKey=${tabKey}`,
+                icon: newIcon,
             };
             setItems((prev) => [...prev, newTab]);
         } else {
@@ -103,6 +119,7 @@ const HeaderTab: React.FC = () => {
                             ...item,
                             label: newLabel,
                             path: `${pathname}?tabKey=${tabKey}`,
+                            icon: newIcon,
                         }
                         : item
                 )
@@ -144,6 +161,7 @@ const HeaderTab: React.FC = () => {
             label: "A2A Client",
             key: newKey,
             path: `/a2a?tabKey=${newKey}`,
+            icon: <RobotOutlined />,
         };
         const newPanes = [...items, newTab];
         setItems(newPanes);
@@ -203,6 +221,14 @@ const HeaderTab: React.FC = () => {
                     className="tab-scroll-container"
                     ref={scrollContainerRef}
                     onWheel={handleWheel}
+                    style={{
+                        flex: 1,
+                        overflowX: 'auto',
+                        overflowY: 'hidden',
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        scrollBehavior: 'smooth'
+                    }}
                 >
                     <div className="tab-items-container">
                         {items.map((item) => (
@@ -214,7 +240,9 @@ const HeaderTab: React.FC = () => {
                                 onClick={() => switchTab(item.key)}
                                 style={{ width: `${tabWidth}px` }}
                             >
-                                <RobotOutlined className="tab-icon" />
+                                <span className="tab-icon">
+                                    {item.icon || <RobotOutlined />}
+                                </span>
                                 <span className="tab-label" title={item.label}>
                                     {item.label}
                                 </span>
@@ -230,22 +258,21 @@ const HeaderTab: React.FC = () => {
                                 )}
                             </div>
                         ))}
+                        {/* Add button always at the end */}
+                        {canAddTab && (
+                            <Tooltip title="Add new tab">
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    className="tab-add-btn"
+                                    onClick={addTab}
+                                >
+                                    +
+                                </Button>
+                            </Tooltip>
+                        )}
                     </div>
                 </div>
-                
-                {/* Add Tab button */}
-                {canAddTab && (
-                    <Tooltip title="Add new tab">
-                        <Button
-                            type="text"
-                            size="small"
-                            className="tab-add-btn"
-                            onClick={addTab}
-                        >
-                            +
-                        </Button>
-                    </Tooltip>
-                )}
             </Flex>
         </div>
     );

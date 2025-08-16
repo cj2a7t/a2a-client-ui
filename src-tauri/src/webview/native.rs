@@ -99,7 +99,7 @@ pub fn create_main_window(app: &AppHandle) -> WebviewWindow {
     .resizable(true)
     .visible(false) 
     .hidden_title(true)
-    .title("ZOAP OpenA2A")
+    .title("A2A Client")
     .title_bar_style(style)
     .traffic_light_position(LogicalPosition::new(12.0, 28.0))
     .build()

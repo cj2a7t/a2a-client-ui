@@ -1,8 +1,7 @@
 import React from 'react';
 import { Input, Button } from 'antd';
-import { SendOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons';
+import { SendOutlined, DeleteOutlined } from '@ant-design/icons';
 import AgentStatusIndicator from './AgentStatusIndicator';
-import { ChangelogModal } from '@/components';
 
 const { TextArea } = Input;
 
@@ -15,7 +14,6 @@ interface ChatInputProps {
     loading: boolean;
     isEnabled: boolean;
     agentConfig: any;
-    onShowConfig: () => void;
     onClearMessages: () => void;
     hasMessages: boolean;
 }
@@ -29,7 +27,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
     loading,
     isEnabled,
     agentConfig,
-    onShowConfig,
     onClearMessages,
     hasMessages
 }) => {
@@ -54,17 +51,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     agentConfig={agentConfig}
                 />
                 <div className="send-action">
-                    <ChangelogModal 
-                        showTrigger={true}
-                        onClose={() => {}}
-                    />
-                    <Button
-                        type="text"
-                        icon={<SettingOutlined />}
-                        onClick={onShowConfig}
-                        className="settings-btn"
-                        title="Configure A2A Client"
-                    />
                     <Button
                         type="text"
                         icon={<DeleteOutlined />}

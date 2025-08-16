@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import KeepAlive from "react-activation";
 import { useTabKey } from "@/utils/tabkey";
-import { useChatLogic, useConfigManagement } from './hooks';
-import { MessageList, ChatInput, ConfigModal, StatusIndicator } from './components';
+import { useChatLogic } from './hooks';
+import { MessageList, ChatInput, StatusIndicator } from './components';
 import { useFlatInject } from '@/utils/hooks';
 import "./style.less";
 
@@ -23,15 +23,6 @@ const A2APage: React.FC = () => {
         handleClearMessages,
         setInputValue,
     } = useChatLogic();
-
-    const {
-        isConfigModalVisible,
-        configForm,
-        showConfigModal,
-        handleConfigOk,
-        handleConfigCancel,
-        getInitialValues,
-    } = useConfigManagement();
 
     // Clear loading state when tab changes
     useEffect(() => {
@@ -99,17 +90,8 @@ const A2APage: React.FC = () => {
                 loading={chatData.isLoading}
                 isEnabled={chatData.isEnabled}
                 agentConfig={chatData.agentConfig}
-                onShowConfig={showConfigModal}
                 onClearMessages={handleClearMessages}
                 hasMessages={chatData.messages.length > 0}
-            />
-
-            <ConfigModal
-                visible={isConfigModalVisible}
-                onOk={handleConfigOk}
-                onCancel={handleConfigCancel}
-                form={configForm}
-                initialValues={getInitialValues()}
             />
         </div>
         // </KeepAlive>

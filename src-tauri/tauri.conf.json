@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "OpenA2A",
+  "productName": "A2A Client",
   "version": "0.1.4",
   "identifier": "site.cj2a7t.opena2a",
   "build": {

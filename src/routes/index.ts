@@ -23,6 +23,11 @@ export default [
                 path: "/a2a",
                 component: "a2a",
             },
+            {
+                name: "Settings",
+                path: "/settings",
+                component: "settings",
+            },
         ],
     },
 ];
