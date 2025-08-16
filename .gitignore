@@ -8,3 +8,4 @@
 /dist
 .swc
 /src-tauri/target
+.DS_Store
