@@ -1,0 +1,381 @@
+.custom-header-tab {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    pointer-events: none;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.tab-container {
+    flex: 1;
+    height: 32px;
+    padding: 2px 2px 0 2px;
+    overflow: hidden;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    max-width: 100%;
+    min-width: 0;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 0;
+    }
+}
+
+// Scroll container styles
+.tab-scroll-container {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // IE/Edge
+
+    // Hide Webkit scrollbar
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    // Smooth scrolling
+    scroll-behavior: smooth;
+
+    // Ensure content can scroll horizontally
+    min-width: 0;
+    max-width: 100%;
+}
+
+.app-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 85px;
+    width: 85px;
+    height: 30px;
+    margin-right: 12px;
+    padding: 6px 10px;
+    background: transparent;
+    border-radius: 10px;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        transform: translateY(-2px) scale(1.02);
+    }
+}
+
+.app-title-main {
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    // text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+}
+
+.app-title-sub {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.6px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin-top: 1px;
+    position: relative;
+    z-index: 2;
+    opacity: 0.95;
+}
+
+.tab-items-container {
+    display: flex;
+    align-items: flex-end; // Changed to end
+    height: 100%;
+    min-width: max-content; // Ensure content won't be compressed
+    gap: 2px; // Add spacing between tabs
+}
+
+.tab-item {
+    position: relative;
+    display: flex;
+    flex-shrink: 0; // Prevent tab from being compressed
+    align-items: center;
+    height: 32px; // Changed to 32px
+    padding: 0 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.15); // Inactive state slightly transparent
+    border: none;
+    border-radius: 6px 6px 0 0; // Only keep top rounded corners
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.2s ease;
+    margin-bottom: 0; // Ensure tab extends to bottom
+
+    // Responsive width adjustment
+    min-width: 60px !important;
+    max-width: 130px !important;
+
+    // Inactive state - embedded in top background
+    &:not(.active) {
+        background: rgba(255, 255, 255, 0.08); // Deeper background color
+        transform: translateY(1px); // Slight downward offset for embedded effect
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(0px);
+        }
+    }
+
+    // Active state - connected to bottom border
+    &.active {
+        color: #374151;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.9); // Brighter background
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        transform: translateY(0); // No offset, aligned with bottom border
+
+        // Connection effect with bottom border - fix white border issue
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; // Extend to bottom border
+            left: 0;
+            right: 0;
+            height: 1px; // Changed to 1px, consistent with bottom border height
+            background: transparent; // Changed to transparent, no white border
+            border-radius: 0; // Remove rounded corners
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+
+            &::after {
+                background: transparent; // Keep transparent
+            }
+        }
+    }
+
+    // Remove original separator line styles
+    &:not(:last-of-type)::after {
+        display: none;
+    }
+}
+
+.tab-icon {
+    flex-shrink: 0;
+    width: 10px;
+    margin-right: 4px;
+    color: #ffffff;
+    font-size: 10px;
+    transition: color 0.15s ease;
+    pointer-events: none;
+
+    .tab-item.active & {
+        color: #1f2937;
+    }
+
+    .tab-item:hover & {
+        color: #374151;
+    }
+}
+
+.tab-label {
+    flex: 1;
+    min-width: 0;
+    max-width: calc(100% - 20px);
+    margin-right: 4px;
+    overflow: hidden;
+    color: #ffffff;
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    transition: color 0.15s ease, font-weight 0.15s ease;
+
+    .tab-item.active & {
+        color: #1f2937;
+        font-weight: 600;
+        text-shadow: none;
+    }
+
+    .tab-item:hover & {
+        color: #374151;
+        font-weight: 600;
+    }
+
+    .tab-item:not(:has(.tab-close-btn)) & {
+        max-width: calc(100% - 14px);
+        margin-right: 0;
+    }
+}
+
+.tab-close-btn {
+    position: relative !important;
+    z-index: 10;
+    display: flex !important;
+    flex-shrink: 0;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 16px !important;
+    height: 20px !important; // Changed height to 20px
+    padding: 0 !important;
+    color: #9ca3af !important;
+    font-size: 9px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 2px !important;
+    opacity: 0.7;
+    transition: all 0.15s ease !important;
+    pointer-events: auto;
+
+    &:hover {
+        color: #ffffff !important;
+        background: rgba(255, 77, 79, 0.9) !important;
+        border: none !important;
+        box-shadow: 0 1px 3px rgba(255, 77, 79, 0.3) !important;
+        transform: scale(1.1) !important;
+        opacity: 1 !important;
+    }
+
+    &:active {
+        border: none !important;
+        transform: scale(0.95) !important;
+    }
+
+    .tab-item.active & {
+        color: #1f2937 !important;
+        opacity: 0.9;
+
+        &:hover {
+            color: #ffffff !important;
+            background: rgba(255, 77, 79, 0.9) !important;
+            border: none !important;
+            transform: scale(1.1) !important;
+        }
+    }
+
+    .tab-item:hover & {
+        color: #6b7280 !important;
+        opacity: 1;
+
+        &:hover {
+            color: #ffffff !important;
+            background: rgba(255, 77, 79, 0.9) !important;
+        }
+    }
+}
+
+.tab-add-btn {
+    z-index: 20;
+    flex-shrink: 0 !important;
+    min-width: 24px !important;
+            height: 32px !important; // Changed to 32px
+    margin-right: 1px !important;
+            margin-bottom: 0 !important; // Ensure extends to bottom
+    color: #ffffff !important;
+    font-size: 12px !important;
+    border: none !important;
+            border-radius: 6px 6px 0 0 !important; // Only keep top rounded corners
+            background: transparent !important; // Remove background
+    opacity: 0.8;
+    transition: all 0.15s ease !important;
+    pointer-events: auto !important;
+            transform: translateY(1px); // Slight downward offset for embedded effect
+
+    &:hover {
+        color: #374151 !important;
+        background: transparent !important; // Keep transparent on hover
+        border: none !important;
+        box-shadow: none !important; // Remove shadow
+        transform: translateY(0px) scale(1.05) !important;
+        opacity: 1 !important;
+    }
+
+    &:active {
+        border: none !important;
+        transform: translateY(0px) scale(0.95) !important;
+    }
+}
+
+// Responsive design - Small screens optimization
+@media (max-width: 768px) {
+    .tab-container {
+        gap: 2px;
+        padding: 1px 1px 0 1px;
+    }
+    
+    .tab-item {
+        min-width: 50px !important;
+        max-width: 120px !important;
+        padding: 0 6px;
+        height: 26px; // Changed height to 26px
+    }
+    
+    .tab-label {
+        font-size: 9px;
+    }
+    
+    .tab-add-btn {
+        height: 26px !important; // Changed height to 26px
+    }
+    
+    .tab-close-btn {
+        height: 18px !important; // Changed height to 18px
+    }
+}
+
+// Responsive design - Extra small screens optimization
+@media (max-width: 480px) {
+    .tab-container {
+        gap: 1px;
+        padding: 1px 1px 0 1px;
+    }
+    
+    .tab-item {
+        min-width: 45px !important;
+        max-width: 100px !important;
+        padding: 0 4px;
+        height: 24px; // Changed height to 24px
+    }
+    
+    .tab-label {
+        font-size: 8px;
+    }
+    
+    .tab-add-btn {
+        height: 24px !important; // Changed height to 24px
+        min-width: 20px !important;
+    }
+    
+    .tab-close-btn {
+        height: 16px !important; // Changed height to 16px
+    }
+}
