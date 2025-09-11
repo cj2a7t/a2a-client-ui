@@ -1,0 +1,129 @@
+.a2a-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 36px); // Subtract HeaderTab height
+    background: #f5f5f5;
+    position: relative;
+
+    .tab-loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+
+
+
+
+
+
+    .config-modal {
+        .ant-modal-body {
+            padding: 24px;
+        }
+
+        .form-item {
+            margin-bottom: 20px;
+
+            .ant-form-item-label {
+                font-weight: 500;
+                color: #262626;
+            }
+
+            .ant-input,
+            .ant-switch {
+                margin-top: 4px;
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+    }
+
+
+}
+
+/* Streaming transmission indicator animation */
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Markdown content styles */
+.markdown-content {
+    .markdown-content {
+        line-height: 1.6;
+        
+        /* Code block style enhancement */
+        pre {
+            margin: 16px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Inline code style enhancement */
+        code {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+        }
+        
+        /* Table style enhancement */
+        table {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        /* Quote style enhancement */
+        blockquote {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Link hover effect */
+        a:hover {
+            border-bottom-color: #0366d6;
+        }
+    }
+}
+
+/* Streaming transmission status indicator */
+.streaming-indicator {
+    animation: pulse 1.5s infinite;
+}
+
+/* Global override for ant-popover-inner padding */
+.ant-popover-inner,
+.ant-popover .ant-popover-inner,
+.ant-popover-inner-content,
+.a2a-server-popover .ant-popover-inner,
+.a2a-server-popover .ant-popover-inner-content,
+.a2a-server-popover .ant-popover-content {
+    padding: 0 !important;
+}
