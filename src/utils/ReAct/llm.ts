@@ -1,19 +1,23 @@
-import { invokeChatCompletion, invokeStreamChat } from "@/request/ipc/invoke";
+import { invokeStreamChat } from "@/request/ipc/invoke";
 import { tauriEventListener } from "../TauriEventListener";
+import { ChatMessage } from "@/types/chat";
+import { getEnabledSettingModels } from "@/request/ipc/invokeSettingModel";
 
-export async function callLLM(
-    apiKey: string,
-    systemPrompt: string,
-    userPrompt: string,
-    useStreaming: boolean = true,
+
+export const asyncChatCompletion = async (
+    messages: ChatMessage[],
+    onComplete?: (fullContent: string) => void,
     onChunk?: (chunk: string) => void,
-    onComplete?: (chunk: string) => void,
-): Promise<string> {
+): Promise<string> => {
+
     try {
-        // If not using streaming, directly call non-streaming API
-        if (!useStreaming) {
-            return await invokeChatCompletion(systemPrompt, userPrompt, apiKey);
+
+        const modelList = await getEnabledSettingModels();
+        const model = modelList.find(model => model.modelKey === "DeepSeek");
+        if (!model) {
+            throw new Error("Currently only deepseek models are supported, please configure your model configuration first.");
         }
+        const apiKey = model.apiKey;
 
         if (!onChunk) {
             throw new Error("onChunk is not defined");
@@ -75,7 +79,7 @@ export async function callLLM(
                 }, 5 * 60 * 1000);
 
                 // Start streaming API
-                invokeStreamChat(systemPrompt, userPrompt, apiKey)
+                invokeStreamChat(messages, apiKey)
                     .then(result => {
                         console.log('Streaming API started successfully:', result);
                     })
