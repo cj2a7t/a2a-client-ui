@@ -1,3 +1,4 @@
+import { ChatMessage } from "@/types/chat";
 import { InvokeResult } from "@/types/invoke";
 import { AgentCard } from "@a2a-js/sdk";
 import { invoke } from "@tauri-apps/api/core";
@@ -51,6 +52,7 @@ export const invokeChatCompletionStream = async (
     }
 };
 
+// Deprecated
 // New: Start streaming chat without waiting for result
 export const startChatCompletionStream = async (
     systemPrompt: string,
@@ -74,16 +76,14 @@ export const startChatCompletionStream = async (
 
 
 export const invokeStreamChat = async (
-    systemPrompt: string,
-    userPrompt: string,
+    messages: ChatMessage[],
     apiKey: string,
     maxTokens?: number,
     temperature?: number
 ): Promise<void> => {
     const res: InvokeResult<string> = await invoke("stream_chat", {
         params: {
-            system_prompt: systemPrompt,
-            user_prompt: userPrompt,
+            messages: messages,
             api_key: apiKey,
             max_tokens: maxTokens,
             temperature: temperature,

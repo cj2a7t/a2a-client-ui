@@ -6,3 +6,8 @@ export interface StreamChunk {
     status?: string;
     status_message?: string;
 }
+
+export type ChatMessage = {
+    role: string;
+    content: string;
+}

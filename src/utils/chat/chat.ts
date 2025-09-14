@@ -9,6 +9,7 @@ import { parseToMap, toPrettyJsonString } from "../json";
 import { toExtractJsonString, toJsonStringWithPrefix, toXmlStringWithPrefix } from "../markdown";
 import { tauriEventListener } from "../TauriEventListener";
 import { XmlUtils } from "../xml";
+import { ChatMessage } from "@/types/chat";
 
 export class ChatUtil {
 
@@ -44,7 +45,14 @@ export class ChatUtil {
             // direct call llm, unuse a2a function
             if (this.forceLLM) {
                 // call llm
-                await this.callLLM(model.apiKey, "", userPrompt, true, this.onChunk, this.onComplete);
+                await this.callLLM(
+                    model.apiKey,
+                    [
+                        { role: "user", content: userPrompt }
+                    ],
+                    this.onChunk,
+                    this.onComplete)
+                    ;
                 await delay(300);
                 this.onChunk("\r");
                 this.onComplete?.("finished");
@@ -74,9 +82,10 @@ export class ChatUtil {
             let finalResponse = "";
             await this.callLLM(
                 model.apiKey,
-                systemPrompts,
-                userPrompt,
-                true,
+                [
+                    { role: "system", content: systemPrompts },
+                    { role: "user", content: userPrompt }
+                ],
                 (_) => { },
                 (fullContent) => {
                     finalResponse = fullContent;
@@ -133,17 +142,11 @@ export class ChatUtil {
 
     private async callLLM(
         apiKey: string,
-        systemPrompt: string,
-        userPrompt: string,
-        useStreaming: boolean = true,
+        messages: ChatMessage[],
         onChunk?: (chunk: string) => void,
-        onComplete?: (chunk: string) => void,
+        onComplete?: (fullContent: string) => void,
     ): Promise<string> {
         try {
-            // If not using streaming, directly call non-streaming API
-            if (!useStreaming) {
-                return await invokeChatCompletion(systemPrompt, userPrompt, apiKey);
-            }
 
             if (!onChunk) {
                 throw new Error("onChunk is not defined");
@@ -205,7 +208,7 @@ export class ChatUtil {
                     }, 5 * 60 * 1000);
 
                     // Start streaming API
-                    invokeStreamChat(systemPrompt, userPrompt, apiKey)
+                    invokeStreamChat(messages, apiKey)
                         .then(result => {
                             console.log('Streaming API started successfully:', result);
                         })

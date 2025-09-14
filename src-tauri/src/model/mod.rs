@@ -38,10 +38,16 @@ pub struct ChatCompletionParams {
     pub api_key: String,
 }
 
+// Message structure for chat completions
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ChatMessage {
+    pub role: String, // "system", "user", "assistant", etc.
+    pub content: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ChatCompletionStreamParams {
-    pub system_prompt: String,
-    pub user_prompt: String,
+    pub messages: Vec<ChatMessage>, // 改为 messages 数组
     pub api_key: String,
     pub max_tokens: Option<u32>,
     pub temperature: Option<f32>,

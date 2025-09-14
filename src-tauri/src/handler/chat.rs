@@ -18,8 +18,8 @@ pub async fn stream_chat(
         return error_response("API key cannot be empty");
     }
 
-    if params.system_prompt.trim().is_empty() && params.user_prompt.trim().is_empty() {
-        return error_response("At least one of system_prompt or user_prompt must be provided");
+    if params.messages.is_empty() {
+        return error_response("Messages array cannot be empty");
     }
 
     // Create AI client using ai.rs library
@@ -28,13 +28,22 @@ pub async fn stream_chat(
         Err(e) => return error_response(&format!("Failed to create AI client: {}", e)),
     };
 
+    // Convert ChatMessage to ChatCompletionMessage
+    let chat_messages: Vec<ChatCompletionMessage> = params
+        .messages
+        .into_iter()
+        .map(|msg| match msg.role.as_str() {
+            "system" => ChatCompletionMessage::System(msg.content.into()),
+            "user" => ChatCompletionMessage::User(msg.content.into()),
+            "assistant" => ChatCompletionMessage::Assistant(msg.content.into()),
+            _ => ChatCompletionMessage::User(msg.content.into()), // 默认为 user
+        })
+        .collect();
+
     // Create streaming request using ai.rs
     let request = match ChatCompletionRequestBuilder::default()
         .model("deepseek-chat")
-        .messages(vec![
-            ChatCompletionMessage::User(params.user_prompt.into()),
-            ChatCompletionMessage::System(params.system_prompt.into()),
-        ])
+        .messages(chat_messages)
         .max_completion_tokens(params.max_tokens.unwrap_or(4000))
         .temperature(params.temperature.unwrap_or(0.7))
         .stream(true)
