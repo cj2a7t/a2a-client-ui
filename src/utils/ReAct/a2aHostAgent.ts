@@ -1,13 +1,12 @@
 import { getA2AHostAgentSystemPrompt } from "./a2aSystemPropmt";
-import { ChatMessage } from "@/types/chat";
 import { asyncChatCompletion } from "./llm";
-import { getEnabledSettingA2AServers } from "@/request/ipc/invokeSettingA2A";
 import delay from "delay";
 import { isEmpty } from "lodash";
 import { AgentCard, AgentSkill } from "@a2a-js/sdk";
-import { invokeSendA2AMessage } from "@/request/ipc/invoke";
 import { sendA2AMessage } from "./a2a";
 import { toPrettyJsonString } from "../json";
+import { toExtractJsonString, toJsonStringWithPrefix } from "../markdown";
+import { SettingA2AServer } from "@/types/a2a";
 
 // Action interface definition
 export interface SendToAgentAction {
@@ -17,36 +16,49 @@ export interface SendToAgentAction {
     message: string;
 }
 
+export type A2ATextKindWrapper = {
+    text: string;
+    text4ReAct: string;
+    text4Chunk: string;
+}
+
+export const streamText = async (
+    text: string,
+    onChunk: (chunk: string) => void,
+) => {
+    let i = 0;
+    while (i < text.length) {
+        const randomChunkSize = Math.floor(Math.random() * 6) + 5;
+        const chunk = text.slice(i, i + randomChunkSize);
+        onChunk(chunk);
+        if (i + randomChunkSize < text.length) {
+            const randomDelay = Math.floor(Math.random() * 101) + 100;
+            await delay(randomDelay);
+        }
+        i += randomChunkSize;
+    }
+    await delay(200);
+    onChunk("\r");
+};
 export class A2AHostAgent {
 
     private readonly MAX_RE_ACT_TIMES = 8;
 
     private onChunk: (chunk: string) => void;
     private onComplete?: (finalAnswer: string) => void;
+    private settingA2AServers: SettingA2AServer[];
 
     constructor(
+        settingA2AServers: SettingA2AServer[],
         onChunk: (chunk: string) => void,
         onComplete?: (finalAnswer: string) => void,
     ) {
         this.onChunk = onChunk;
         this.onComplete = onComplete;
+        this.settingA2AServers = settingA2AServers;
     }
 
-    buildA2AStatus(a2aResponseTask: any, agentName: string, skillName: string): string {
-        const status = a2aResponseTask.result.status;
-        let statusResult = isEmpty(status) ? "completed" : status.state
-        const stateText = statusResult === "failed" ? "🔴" : "🟢";
-        const a2aResponseTaskText = "#### A2A Server Response: \n" +
-            "> 🤖  **Discovered Server Name:** " + agentName + "  \n" +
-            "> 🛠️  **Discovered Skill Name:** " + skillName + "  \n" +
-            "##### " + stateText + " Invocation " + statusResult + " \n" +
-            "```json\n" +
-            toPrettyJsonString(a2aResponseTask) +
-            "\n```\n";
-        return a2aResponseTaskText;
-    }
-
-    buildA2ATextKindResult(a2aResponseTask: any): any {
+    buildA2ATextKindResult(a2aResponseTask: any, reActTimes: number, agentName: string, skillName: string): A2ATextKindWrapper {
         let a2aText;
         try {
             a2aText = a2aResponseTask.result.parts[0].text;
@@ -54,9 +66,18 @@ export class A2AHostAgent {
             console.warn('Failed to get a2aText:', error);
             a2aText = "ReAct: please check the result in the A2A Server.";
         }
+        const status = a2aResponseTask.result.status;
+        let statusResult = isEmpty(status) ? "completed" : status.state
+        const stateText = statusResult === "failed" ? "🔴" : "🟢";
         return {
-            org: a2aText,
-            wrapped: "#### A2A Server Result: \n" + a2aText + " \n"
+            text: a2aText,
+            text4ReAct: `<observation>${reActTimes}. ${a2aText}</observation>`,
+            text4Chunk: "#### Observation: \n" +
+                "> 🤖  **Discovered Server Name:** " + agentName + "  \n" +
+                "> 🛠️  **Discovered Skill Name:** " + skillName + "  \n" +
+                "##### " + stateText + " **Invocation** " + statusResult + " \n" +
+                a2aText + " \n" +
+                " \n"
         };
     }
 
@@ -72,6 +93,7 @@ export class A2AHostAgent {
             if (!actionMatch) {
                 return null;
             }
+            console.log('===>>>actionMatch: ', actionMatch);
 
             const actionContent = actionMatch[1].trim();
 
@@ -80,13 +102,12 @@ export class A2AHostAgent {
             if (!sendToAgentMatch) {
                 return null;
             }
-
-            const params = sendToAgentMatch[1];
+            let params = sendToAgentMatch[1];
 
             // Extract parameter values
-            const agentNameMatch = params.match(/agent_name\s*=\s*"([^"]+)"/);
-            const skillNameMatch = params.match(/skill_name\s*=\s*"([^"]+)"/);
-            const messageMatch = params.match(/message\s*=\s*"([^"]+)"/);
+            let agentNameMatch = params.match(/agent_name\s*=\s*"([^"]+)"/);
+            let skillNameMatch = params.match(/skill_name\s*=\s*"([^"]+)"/);
+            let messageMatch = params.match(/message\s*=\s*"([^"]+)"/);
 
             if (!agentNameMatch || !skillNameMatch || !messageMatch) {
                 throw new Error('Missing required parameters in send_to_agent action');
@@ -125,24 +146,6 @@ export class A2AHostAgent {
         return thoughtMatch ? thoughtMatch[1].trim() : "";
     }
 
-    async streamText(
-        text: string,
-        onChunk: (chunk: string) => void,
-    ) {
-        let i = 0;
-        while (i < text.length) {
-            const randomChunkSize = Math.floor(Math.random() * 6) + 5;
-            const chunk = text.slice(i, i + randomChunkSize);
-            onChunk(chunk);
-            if (i + randomChunkSize < text.length) {
-                const randomDelay = Math.floor(Math.random() * 101) + 100;
-                await delay(randomDelay);
-            }
-            i += randomChunkSize;
-        }
-        await delay(200);
-        onChunk("\r");
-    };
 
     async repeatReAct(times: number, fn: () => Promise<boolean>): Promise<void> {
         for (let i = 0; i < times; i++) {
@@ -153,46 +156,68 @@ export class A2AHostAgent {
         }
     };
 
-    async sendMessage(userPrompt: string) {
+    async executeReAct(userPrompt: string) {
         try {
-            const a2aServers = await getEnabledSettingA2AServers();
-            const systemPrompt = getA2AHostAgentSystemPrompt(a2aServers);
+
+            // build ReAct messages
+            const systemPrompt = getA2AHostAgentSystemPrompt(this.settingA2AServers);
             const reActMessages = [
                 { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt }
+                { role: "user", content: "<question>" + userPrompt + "</question>" }
             ];
 
+            // Simply avoid ReAct's infinite loop issue
+            let reActTimes = 1;
             await this.repeatReAct(this.MAX_RE_ACT_TIMES, async () => {
+
+                // Call LLM to get content
                 let content = '';
                 await asyncChatCompletion(
                     reActMessages,
-                    (fullContext) => {
-                        content = fullContext;
+                    () => { },
+                    (fullContent) => {
+                        content = fullContent;
                     }
                 );
+                console.log('===>>>content: ', content);
 
+                // Extract [thought]
                 const thought = this.extractThought(content);
                 if (!isEmpty(thought)) {
-                    this.streamText(thought, this.onChunk)
+                    const thoughtText = "> **Thought:** " + thought + " \n";
+                    await streamText(thoughtText, this.onChunk)
                 }
 
+                await delay(200);
+                this.onChunk("\r");
+
+                // Extract [final answer]
                 const finalAnswer = this.extractFinalAnswer(content);
                 if (!isEmpty(finalAnswer)) {
-                    this.streamText(finalAnswer, this.onChunk)
+                    const finalAnswerText = "#### Final Answer: \n" + finalAnswer + " \n";
+                    await streamText(finalAnswerText, this.onChunk)
                     this.onComplete?.(finalAnswer);
                     return true;
                 }
 
+                await delay(200);
+                this.onChunk("\r");
+
+                // Extract [action]
                 const action: SendToAgentAction | null = this.extractAction(content);
                 if (action == null) {
                     throw new Error("ReAct failed, no action found");
                 }
-
                 const agentName = action.agent_name;
                 const skillName = action.skill_name;
                 const message = action.message;
+                await streamText(toJsonStringWithPrefix("#### Action: \n", action) + " \n", this.onChunk)
 
-                const settingA2AServer = a2aServers.find(server => server.name === agentName);
+                await delay(200);
+                this.onChunk("\r");
+
+                // Send message to A2A server
+                const settingA2AServer = this.settingA2AServers.find(server => server.name === agentName);
                 if (settingA2AServer == null) {
                     throw new Error("ReAct failed, no a2a server found");
                 }
@@ -202,22 +227,26 @@ export class A2AHostAgent {
                     throw new Error("ReAct failed, no skill found");
                 }
                 const a2aResponseTask = await sendA2AMessage(message, agentCard.url, skill.id, settingA2AServer.id);
-                const a2aResponseTaskText = this.buildA2AStatus(a2aResponseTask, agentName, skillName);
-                await this.streamText(a2aResponseTaskText, this.onChunk);
 
-                const a2aText = this.buildA2ATextKindResult(a2aResponseTask);
-                await this.streamText(a2aText.wrapped, this.onChunk);
-
+                // Build [observation]
+                const a2aText = this.buildA2ATextKindResult(a2aResponseTask, reActTimes, agentName, skillName);
+                await streamText(a2aText.text4Chunk, this.onChunk);
                 reActMessages.push({
                     role: "user",
-                    content: a2aText.org
+                    content: a2aText.text4ReAct
                 })
+
+                reActTimes++;
                 return false;
             });
         } catch (error) {
-            // TODO
+            console.error("Failed to send message:", error);
+            const errorPrefix = "##### Error: \n";
+            this.onChunk(errorPrefix);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorText = toExtractJsonString(errorMessage);
+            await streamText(errorText, this.onChunk);
+            this.onComplete?.("finished");
         }
     }
-
-
 }

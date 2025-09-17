@@ -45,7 +45,7 @@ pub async fn stream_chat(
         .model("deepseek-chat")
         .messages(chat_messages)
         .max_completion_tokens(params.max_tokens.unwrap_or(4000))
-        .temperature(params.temperature.unwrap_or(0.7))
+        .temperature(params.temperature.unwrap_or(0.3))
         .stream(true)
         .build()
     {

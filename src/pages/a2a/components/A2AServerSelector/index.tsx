@@ -23,7 +23,7 @@ const A2AServerSelector: React.FC = React.memo(() => {
     }, [onToggleAgentEnabled]);
 
     // Memoize the enabled agents count
-    const enabledAgentsCount = useMemo(() => 
+    const enabledAgentsCount = useMemo(() =>
         settingAgents.filter(agent => agent.enabled).length, [settingAgents]
     );
 
@@ -34,6 +34,7 @@ const A2AServerSelector: React.FC = React.memo(() => {
             dataIndex: 'name',
             key: 'name',
             width: 180,
+            ellipsis: true,
             render: (text: string, record: SettingA2AServer) => (
                 <div
                     className={`server-name-cell ${record.enabled ? 'enabled' : 'disabled'}`}
@@ -50,7 +51,7 @@ const A2AServerSelector: React.FC = React.memo(() => {
         {
             title: 'Skills',
             key: 'skills',
-            width: 150,
+            width: 80,
             render: (_: any, record: SettingA2AServer) => {
                 let skillsCount = 0;
                 let skillsList: string[] = [];
@@ -101,7 +102,7 @@ const A2AServerSelector: React.FC = React.memo(() => {
         {
             title: 'Enable',
             key: 'enable',
-            width: 100,
+            width: 50,
             render: (_: any, record: SettingA2AServer) => (
                 <div className="enable-cell">
                     <Switch

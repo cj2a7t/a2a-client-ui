@@ -12,8 +12,12 @@ export const saveSettingA2AServer = async (params: SettingA2AServerParams): Prom
         const updatedParams = { ...params };
         if (params.agentCardUrl && params.agentCardUrl.trim().length > 0) {
             try {
+                const token = JSON.parse(params.customHeaderJson || "{}")["Authorization"] || "";
                 const agentCardResult = await invoke<{ code: number; message: string; data?: any }>('get_agent_card', {
-                    params: { url: params.agentCardUrl }
+                    params: {
+                        url: params.agentCardUrl,
+                        token: token
+                    }
                 });
                 if (agentCardResult.code === 0 && agentCardResult.data) {
                     updatedParams.agentCardJson = JSON.stringify(agentCardResult.data);
@@ -27,7 +31,9 @@ export const saveSettingA2AServer = async (params: SettingA2AServerParams): Prom
             }
         }
 
-        const result = await invoke<{ code: number; message: string; data?: number }>('save_setting_a2a_server', { params: updatedParams });
+        const result = await invoke<{ code: number; message: string; data?: number }>('save_setting_a2a_server', {
+            params: updatedParams
+        });
         if (result.code === 0 && result.data !== undefined) {
             return result.data;
         } else {
@@ -50,8 +56,9 @@ export const updateSettingA2AServer = async (params: UpdateSettingA2AServerParam
         const updatedParams = { ...params };
         if (params.agentCardUrl && params.agentCardUrl.trim().length > 0) {
             try {
+                const token = JSON.parse(params.customHeaderJson || "{}")["Authorization"] || "";
                 const agentCardResult = await invoke<{ code: number; message: string; data?: any }>('get_agent_card', {
-                    params: { url: params.agentCardUrl }
+                    params: { url: params.agentCardUrl, token: token }
                 });
                 if (agentCardResult.code === 0 && agentCardResult.data) {
                     updatedParams.agentCardJson = JSON.stringify(agentCardResult.data);

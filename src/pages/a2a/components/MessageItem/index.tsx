@@ -128,7 +128,7 @@ const MessageItem: React.FC<MessageItemProps> = React.memo((
                             size="small"
                             className="message-card user-card"
                         >
-                            <Text style={{ whiteSpace: 'pre-wrap' }}>{message.content}</Text>
+                            <Text style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{message.content}</Text>
                         </Card>
                         {/* user message footer */}
                         <div className="message-footer">

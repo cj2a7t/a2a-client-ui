@@ -6,8 +6,8 @@ import { getEnabledSettingModels } from "@/request/ipc/invokeSettingModel";
 
 export const asyncChatCompletion = async (
     messages: ChatMessage[],
-    onComplete?: (fullContent: string) => void,
     onChunk?: (chunk: string) => void,
+    onComplete?: (fullContent: string) => void,
 ): Promise<string> => {
 
     try {

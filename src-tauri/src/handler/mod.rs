@@ -109,6 +109,7 @@ pub async fn get_agent_card(params: AgentCardParams) -> InvokeResponse<AgentCard
     let response = client
         .get(&full_url)
         .header("Accept", "application/json")
+        .bearer_auth(params.token.unwrap_or_default())
         .send()
         .await;
 
@@ -181,8 +182,14 @@ pub async fn send_a2a_message(params: A2AMessageParams) -> InvokeResponse<String
         if obj.get("kind").and_then(|k| k.as_str()) == Some("data") {
             let data = obj
                 .get("data")
-                .and_then(|d| d.as_str())
-                .unwrap_or("")
+                .map(|d| {
+                    if let Some(s) = d.as_str() {
+                        s.to_string()
+                    } else {
+                        d.to_string()
+                    }
+                })
+                .unwrap_or_default()
                 .replace("{{USER_PROMPT}}", &params.text);
             vec![A2AMessagePart::Data(A2ADataPart::new(data))]
         } else {
@@ -225,7 +232,11 @@ pub async fn send_a2a_message(params: A2AMessageParams) -> InvokeResponse<String
         {
             for (key, value) in headers {
                 if let Some(header_value) = value.as_str() {
-                    request_builder = request_builder.header(key, header_value);
+                    if key == "Authorization" {
+                        request_builder = request_builder.bearer_auth(header_value);
+                    } else {
+                        request_builder = request_builder.header(key, header_value);
+                    }
                 }
             }
         }

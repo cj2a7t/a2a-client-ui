@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "A2A Client UI",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "identifier": "site.cj2a7t.opena2a",
   "build": {
     "frontendDist": "../dist",

@@ -5,28 +5,16 @@ import { formatTime } from './date';
 
 
 export class XmlUtils {
-    private static readonly RETURN_JSON = '{"skillId": "$skill_id","skillName": "$skill_name","skillDescription": "$skill_description","agentUrl": "$agent_url","agentName": "$agent_name","agentId": "$agent_id","userPrompts": "$user_prompts"}';
 
     /**
      * Build A2A servers XML document from SettingA2AServer array
-     * 
-     * @example
-     * ```typescript
-     * const a2aServers: SettingA2AServer[] = [
-     *   { name: "Local Server", agentCardUrl: "http://localhost:8080", enabled: true },
-     *   { name: "Production Server", agentCardUrl: "https://prod.example.com", enabled: true }
-     * ];
-     * 
-     * const xml = XmlUtils.buildA2AServersXml(a2aServers);
-     * // Output: formatted XML with system_prompt and skills structure
-     * ```
      */
     public static buildA2AServersXml(a2aServers: SettingA2AServer[]): string {
         try {
             const doc = document.implementation.createDocument(null, 'system_prompt', null);
             const root = doc.documentElement;
             root.setAttribute('role', 'assistant');
-            root.setAttribute('version', 'v0.1.4');
+            root.setAttribute('version', 'v0.1.5');
             root.setAttribute("timestamp", formatTime(new Date()));
 
             const skillsElement = doc.createElement('skills');
@@ -42,10 +30,10 @@ export class XmlUtils {
                 for (const skill of agentCardSkills) {
                     const skillElement = doc.createElement('skill');
 
-                    const idElement = doc.createElement('id');
+                    const idElement = doc.createElement('skill_id');
                     idElement.textContent = skill.id;
 
-                    const nameElement = doc.createElement('name');
+                    const nameElement = doc.createElement('skill_name');
                     nameElement.textContent = skill.name;
 
                     const descriptionElement = doc.createElement('description');
@@ -57,22 +45,11 @@ export class XmlUtils {
                     const agentNameElement = doc.createElement('agent_name');
                     agentNameElement.textContent = agentCard.name;
 
-                    const responseJsonElement = doc.createElement('response_json');
-                    const responseJson = XmlUtils.RETURN_JSON
-                        .replace('$skill_id', skill.id)
-                        .replace('$skill_name', skill.name)
-                        .replace('$skill_description', skill.description)
-                        .replace('$agent_url', agentCard.url)
-                        .replace('$agent_name', agentCard.name)
-                        .replace('$agent_id', server.id?.toString() || 'unknown');
-                    responseJsonElement.textContent = responseJson;
-
                     skillElement.appendChild(idElement);
                     skillElement.appendChild(nameElement);
                     skillElement.appendChild(descriptionElement);
                     skillElement.appendChild(agentUrlElement);
                     skillElement.appendChild(agentNameElement);
-                    skillElement.appendChild(responseJsonElement);
                     skillsElement.appendChild(skillElement);
                 }
             }

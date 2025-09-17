@@ -22,6 +22,22 @@ const Changelog: React.FC = () => {
   // Changelog data
   const changelogData: ChangelogEntry[] = [
     {
+      version: "0.1.5",
+      date: "2025-09-17",
+      type: "improvement",
+      title: "UI Refinements, ReAct Facade, and IPC Updates",
+      description: [
+        "Added ReAct facade integration for A2A workflows",
+        "Improved A2A Server selector UX and styles",
+        "Enhanced chat input behavior and shortcuts",
+        "Polished message item rendering and styles",
+        "Updated A2A settings IPC to support latest schema",
+        "Strengthened XML parsing and safety checks",
+        "Optimized LLM request handling and system prompt",
+        "Stabilized backend chat/model handlers",
+      ],
+    },
+    {
       version: "0.1.4",
       date: "2025-01-15",
       type: "feature",

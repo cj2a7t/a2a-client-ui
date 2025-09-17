@@ -178,6 +178,7 @@ pub struct A2AMessageParams {
 #[derive(Debug, Deserialize)]
 pub struct AgentCardParams {
     pub url: String,
+    pub token: Option<String>,
 }
 
 // Model configuration related type definitions

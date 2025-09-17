@@ -37,7 +37,7 @@ const Agents: React.FC = () => {
         form.setFieldsValue({
             agent_card_url: agent.agentCardUrl,
             custom_header_json: agent.customHeaderJson ? toPrettyJsonString(JSON.parse(agent.customHeaderJson)) : toPrettyJsonString({
-                "X-A2A-Client-UI-Version": "v0.1.4"
+                "X-A2A-Client-UI-Version": "v0.1.5"
             }),
             protocol_data_object_settings: agent.protocolDataObjectSettings ? toPrettyJsonString(JSON.parse(agent.protocolDataObjectSettings)) : toPrettyJsonString({
                 "kind": "text",
@@ -197,7 +197,7 @@ const Agents: React.FC = () => {
                         ...editingAgent,
                         agentCardUrl: values.agent_card_url,
                         customHeaderJson: values.custom_header_json || toPrettyJsonString({
-                            "X-A2A-Client-UI-Version": "v0.1.4"
+                            "X-A2A-Client-UI-Version": "v0.1.5"
                         }),
                         protocolDataObjectSettings: values.protocol_data_object_settings || toPrettyJsonString({
                             "kind": "text",
@@ -221,7 +221,7 @@ const Agents: React.FC = () => {
                         enabled: false,
                         agentCardJson: '',
                         customHeaderJson: values.custom_header_json || toPrettyJsonString({
-                            "X-A2A-Client-UI-Version": "v0.1.4"
+                            "X-A2A-Client-UI-Version": "v0.1.5"
                         }),
                         protocolDataObjectSettings: values.protocol_data_object_settings || toPrettyJsonString({
                             "kind": "text",
@@ -376,7 +376,7 @@ const Agents: React.FC = () => {
                                 height="100%"
                                 defaultLanguage="json"
                                 value={form.getFieldValue('custom_header_json') || toPrettyJsonString({
-                                    "X-A2A-Client-UI-Version": "v0.1.4"
+                                    "X-A2A-Client-UI-Version": "v0.1.5"
                                 })}
                                 options={{
                                     minimap: { enabled: false },

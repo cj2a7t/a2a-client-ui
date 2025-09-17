@@ -14,7 +14,7 @@ const About: React.FC = () => {
                 </Title>
 
                 {/* Version */}
-                <Text className="version">v0.1.4</Text>
+                <Text className="version">v0.1.5</Text>
 
                 {/* Slogan */}
                 <Paragraph className="slogan">

@@ -1,4 +1,3 @@
-import { createDyncmicChat } from '@/utils/chat/chat';
 import { useFlatInject } from '@/utils/hooks';
 import { useTabKey } from '@/utils/tabkey';
 import { DeleteOutlined, MessageOutlined, SendOutlined, ThunderboltOutlined } from '@ant-design/icons';
@@ -7,6 +6,7 @@ import { debounce, isEmpty } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import A2AServerSelector from '../A2AServerSelector';
 import './style.less';
+import { executeA2AReAct, executeReAct4A2AHostAgent } from '@/utils/ReAct/reActFacade';
 
 const commands = [
     {
@@ -75,21 +75,16 @@ const ChatInput: React.FC = React.memo(() => {
         try {
             await onPushUserMessage(tabKey, userMessage);
             await onInitAIMessage(tabKey, "🤔 Thinking...");
-
             const chunks: string[] = [];
             const debouncedUpdate = createDebouncedUpdate();
-            const chatUtil = await createDyncmicChat(
-                (respChunk) => {
-                    chunks.push(respChunk);
-                    debouncedUpdate(chunks.join(''));
-                },
-                (_) => {
-                    onSetStreaming(tabKey, false);
-                }
-            );
-            onSetStreaming(tabKey, true);
             try {
-                chatUtil.sendMessage(userMessage);
+                onSetStreaming(tabKey, true);
+                executeA2AReAct(userMessage, (chunk) => {
+                    chunks.push(chunk);
+                    debouncedUpdate(chunks.join(''));
+                }, (_) => {
+                    onSetStreaming(tabKey, false);
+                });
             } finally {
                 debouncedUpdate.flush();
                 onResetUserMessage(tabKey);

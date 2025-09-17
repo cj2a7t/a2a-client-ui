@@ -19,6 +19,7 @@ export const agentCommunicationPromptTemplate = `
 
 1. **顺序发送模式**：按顺序向多个Agent发送消息，不等待前一个Agent的响应
 2. **等待响应模式**：发送消息后等待Agent响应，根据响应结果决定下一步操作
+3. **多次等待响应模式**：发送消息后等待Agent响应，根据响应结果决定下一步操作，需要根据次数是否停止。
 
 ⸻
 
@@ -51,6 +52,19 @@ export const agentCommunicationPromptTemplate = `
 <thought>航班查询和预订都已完成。</thought>
 <final_answer>已成功查询航班信息并完成预订。查询到3个航班选项，选择了价格800元的航班A，预订成功，订单号：BK20241201001。</final_answer>
 
+⸻
+
+例子 3 - 连续响应模式：
+
+<question>请给我讲两个笑话</question>
+<thought>我需要使用笑话技能执行两次，每次执行后都需要等待响应。</thought>
+<action>send_to_agent(agent_name="xxx", skill_name="xxx", message="请给我讲一个笑话")</action>
+<observation>1.鱼儿离不开开开水，水儿热死了。</observation>
+<thought>现在讲第二个笑话。</thought>
+<action>send_to_agent(agent_name="xxx", skill_name="xxx", message="请再给我讲一个笑话")</action>
+<observation>2.小明去公园玩，看到一个美女，美女说：“小明，你真帅！”小明说：“美女，你真漂亮！”</observation>
+<thought>两个笑话都讲完了。</thought>
+<final_answer>已经连续讲完了两个笑话。</final_answer>
 
 ⸻
 
@@ -60,6 +74,10 @@ export const agentCommunicationPromptTemplate = `
 - 如果 <action> 中的消息内容有多行的话，请使用 \\n 来表示
 - 根据任务特点选择合适的通信模式：独立任务用顺序发送，有依赖关系的任务用等待响应模式
 - 在 <thought> 中明确说明选择该通信模式的原因
+- 如果遇到请求action失败的情况或者没有查到结果之类的响应，下次直接生成 <final_answer>
+- 如果遇到请求action响应是成功的，如果没有接下来的action，你便直接生成<final_answer>，不需要继续执行相同的action。
+- 如果没有对应的Skill，应该直接生成<final_answer>，不需要继续执行相同的action。
+- 不要出现action中的内容带有...的情况。
 
 ⸻
 
